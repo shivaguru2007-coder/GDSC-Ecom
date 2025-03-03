@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongoose": "^8.12.0"
+  },
+  "name": "gdsc-ecommerce",
+  "version": "1.0.0",
+  "description": "E-com",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shivaguru2007-coder/GDSC-Ecom.git"
+  },
+  "author": "SG",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shivaguru2007-coder/GDSC-Ecom/issues"
+  },
+  "homepage": "https://github.com/shivaguru2007-coder/GDSC-Ecom#readme"
+}
