@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {register,verify,login,addBalance} = require("../controllers/user.controller");
+const {register,verify,login,addBalance, resendVerification} = require("../controllers/user.controller");
 const cartController = require("../controllers/cart.controller");
 const { validateUserCreation,verifyUser} = require("../middleware/user.middleware");
 const orderController = require("../controllers/order.controller");
@@ -10,7 +10,7 @@ const orderController = require("../controllers/order.controller");
 router.post("/auth/register",validateUserCreation, register);
 router.post("/auth/verify", verify);
 router.post("/auth/login", login);
-
+router.post("/auth/resendotp",resendVerification)
 //Balance routes
 router.post("/add",verifyUser,addBalance)
 
