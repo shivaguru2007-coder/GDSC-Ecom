@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {register,verify,login,addBalance} = require("../controllers/user.controller");
 const cartController = require("../controllers/cart.controller");
-const { validateUserCreation} = require("../middleware/user.middleware");
+const { validateUserCreation,verifyUser} = require("../middleware/user.middleware");
 const orderController = require("../controllers/order.controller");
 
 
@@ -12,16 +12,16 @@ router.post("/auth/verify", verify);
 router.post("/auth/login", login);
 
 //Balance routes
-router.post("/add",addBalance)
+router.post("/add",verifyUser,addBalance)
 
 //cart Routes
-router.post("/cart/add", cartController.addCart);
-router.get("/cart/:userId", cartController.getCart);
-router.put("/cart/update", cartController.updateCart);
-router.delete("/cart/remove", cartController.removeCart);
-router.delete("/cart/clear/:userId", cartController.clearCart);
-
+router.post("/cart/add",verifyUser, cartController.addCart);
+router.get("/cart/:userId",verifyUser, cartController.getCart);
+router.put("/cart/update",verifyUser, cartController.updateCart);
+router.delete("/cart/remove",verifyUser, cartController.removeCart);
+router.delete("/cart/clear/:userId", verifyUser, cartController.clearCart);
+router.delete("/cart/reduce",verifyUser,cartController.reduceCart)
 //Order Routes
-router.post("/order",orderController.placeOrder)
+router.post("/order",verifyUser,orderController.placeOrder)
 
 module.exports = router;

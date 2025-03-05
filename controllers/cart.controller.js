@@ -1,10 +1,6 @@
 const User = require("../models/users");
 const Product = require("../models/product");
-//const router = express.Router();
 
-/**
- * 1. Add product to cart (CREATE)
- */
 const addCart = async (req, res) => {
   const { userId, productId, quantity } = req.body;
 
@@ -34,9 +30,7 @@ const addCart = async (req, res) => {
   }
 };
 
-/**
- * 2. Get user cart (READ)
- */
+
 const getCart =  async (req, res) => {
   const { userId } = req.params;
 
@@ -50,9 +44,6 @@ const getCart =  async (req, res) => {
   }
 };
 
-/**
- * 3. Update product quantity in cart (UPDATE)
- */
 const updateCart = async (req, res) => {
   const { userId, productId, quantity } = req.body;
 
@@ -76,9 +67,6 @@ const updateCart = async (req, res) => {
   }
 };
 
-/**
- * 4. Remove product from cart (DELETE)
- */
 const removeCart = async (req, res) => {
   const { userId, productId } = req.body;
 
@@ -98,10 +86,33 @@ const removeCart = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const reduceCart = async (req, res) => {
+    const { userId, productId,quantity } = req.body;
+  
+    if (!userId || !productId || !quantity) {
+      return res.status(400).json({ message: "Invalid user ID or product ID or quantity" });
+    }
+    
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      const cartItem = user.cart.find((item) => item.productId.toString() === productId);
 
-/**
- * 5. Clear entire cart (DELETE ALL)
- */
+      if (cartItem) {
+        cartItem.quantity -= quantity;
+      } else {
+        return  res.status(404).json({ message:"Product doesn't exist."})
+      }
+  
+      await user.save();
+  
+      res.json({ message: quantity+" number of Product removed from cart", cart: user.cart });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error });
+    }
+};
+
 const clearCart = async (req, res) => {
   const { userId } = req.params;
 
@@ -124,4 +135,5 @@ module.exports = {
     updateCart,
     clearCart,
     removeCart,
+    reduceCart
 };
