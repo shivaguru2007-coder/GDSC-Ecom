@@ -20,8 +20,10 @@ router.get("/cart/:userId",verifyUser, cartController.getCart);
 router.put("/cart/update",verifyUser, cartController.updateCart);
 router.delete("/cart/remove",verifyUser, cartController.removeCart);
 router.delete("/cart/clear/:userId", verifyUser, cartController.clearCart);
-router.delete("/cart/reduce",verifyUser,cartController.reduceCart)
+router.delete("/cart/reduce",verifyUser,cartController.reduceCart);
+router.get("/cart/val",verifyUser,cartController.cartVal);
 //Order Routes
-router.post("/order",verifyUser,orderController.placeOrder)
-
+router.post("/order/place",verifyUser,orderController.finishOrder);
+router.post("/order/applycoupon",verifyUser,orderController.applyCoupon);
+router.post("/order/create",verifyUser,orderController.createOrder);
 module.exports = router;
