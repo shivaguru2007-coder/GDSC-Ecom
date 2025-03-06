@@ -115,9 +115,9 @@ const login = async (req, res) => {
 
 // Add funds - Step 1: Initiate Payment
 const addBalance = async (req, res) => {
-  const { email, amount } = req.body;
+  const { userId, amount } = req.body;
 
-  if (!email || !amount || amount <= 0) {
+  if (!userId || !amount || amount <= 0) {
     return res.status(400).json({ message: "Invalid amount or user ID" });
   }
 
@@ -125,12 +125,12 @@ const addBalance = async (req, res) => {
     // Simulate payment process
     const paymentResponse = await mockPaymentGateway(amount);
 
-    if (!paymentResponse.success) {
+    if (paymentResponse.success) {
       return res.status(400).json({ message: "Payment failed" });
     }
 
     // Step 2: Update balance upon successful payment
-    const user = await User.findOne({email});
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

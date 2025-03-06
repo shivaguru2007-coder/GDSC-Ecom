@@ -86,32 +86,9 @@ const sellerLogin = async (req, res) => {
 };
 
 
-/**
- * Seller creates a new coupon
- */
-const createCoupon = async (req, res) => {
-  const { code, discount, maxDiscount, minOrderValue, expiry } = req.body;
-
-  if (!code || !discount || !maxDiscount || !minOrderValue || !expiry) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    const existingCoupon = await Coupon.findOne({ code });
-    if (existingCoupon) return res.status(400).json({ message: "Coupon code already exists" });
-
-    const coupon = new Coupon({ code, discount, maxDiscount, minOrderValue, expiry });
-    await coupon.save();
-
-    res.json({ message: "Coupon created successfully", coupon });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
 
 
 module.exports={
-    createCoupon,
     createSeller,
     getSellerDetails,
     updateSeller,

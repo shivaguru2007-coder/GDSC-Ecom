@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../models/users");
-const { findById } = require("../models/product");
 
 const verifyAdmin = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1]; 
@@ -39,13 +38,14 @@ const verifyUser = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(tokenParts[1], process.env.JWT_SECRET);
-    req.user = decoded; // Attach decoded user data to request object
+    req.user = decoded;
 
-    next(); // Move to the next middleware
+    next();
   } catch (error) {
     return res.status(401).json({ message: "Invalid or expired token.", error: error.message });
   }
 };
+
 const validateUserCreation = (req, res, next) => {
     const requiredFields = [
       "name",
