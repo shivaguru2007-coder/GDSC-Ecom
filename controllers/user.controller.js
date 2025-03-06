@@ -123,7 +123,7 @@ const addBalance = async (req, res) => {
     // Simulate payment process
     const paymentResponse = await mockPaymentGateway(amount);
 
-    if (paymentResponse.success) {
+    if (!paymentResponse.success) {
       return res.status(400).json({ message: "Payment failed" });
     }
 

@@ -1,11 +1,12 @@
 const Coupon = require("../models/coupon");
 const Order = require("../models/order");
 const User = require("../models/users");
+const {orderConfirm} = require("./mail.controller");
 const mockPayment = require("./payment.controllers");
 
 const createOrder = async (req, res) => {
-  const { userId } = req.body;
-
+  const { userId } = req.body
+  
   if (!userId) return res.status(400).json({ message: "User ID is required" });
 
   try {
@@ -62,8 +63,8 @@ const applyCoupon = async (req, res) => {
 };
 
 const finishOrder = async (req, res) => {
-  const { userId, orderId } = req.body;
-
+  const { userId, orderId } = req.body
+  
   if (!userId || !orderId) return res.status(400).json({ message: "User ID and Order ID are required" });
 
   try {
@@ -76,7 +77,9 @@ const finishOrder = async (req, res) => {
 
     const paymentSuccess = await mockPayment.mockPaymentGateway(order.totalAmount);
     if (!paymentSuccess.success) throw new Error("Payment failed, try again");
-
+    //mail for order confirmation
+    console.log(user.email,user.name,orderId);
+    orderConfirm(user.email,user.name,orderId);
     user.balance -= order.totalAmount;
     user.cart = [];
     order.status = "Paid";

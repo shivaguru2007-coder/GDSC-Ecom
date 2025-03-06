@@ -1,27 +1,39 @@
 const Category = require("../models/category")
 
-const addCategory =async (req, res) => {
-    try {
-      console.log(req.file)
-      const {id, title, description } = req.body;
-  
+const addCategory = async (req, res) => {
+  try {
+    const categories = req.body.categories;
+
+    if (!Array.isArray(categories)) {
+      return res.status(400).json({ message: "Categories should be an array" });
+    }
+
+    const results = [];
+
+    for (const categoryData of categories) {
+      const { id, title, description } = categoryData;
+
       const existingCategory = await Category.findOne({ title });
       if (existingCategory) {
-        return res.status(400).json({ message: "Category title already exists" });
+        results.push({ title, status: "failed", message: "Category title already exists" });
+        continue;
       }
-  
+
       const newCategory = new Category({
         id,
         title,
         description,
       });
-  
+
       await newCategory.save();
-      res.status(201).json({ message: "Category added successfully", category: newCategory });
-    } catch (error) {
-      res.status(500).json({ message: "Server error", error });
+      results.push({ title, status: "success", message: "Category added successfully", category: newCategory });
     }
+
+    res.status(201).json({ results });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
+};
   const updateCategory = async (req, res) => {
     try {
       const { categoryId, title, description } = req.body;

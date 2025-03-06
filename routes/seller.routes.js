@@ -19,14 +19,13 @@ router.delete("/delete", auth.verifySeller, sellerController.deleteSeller);
 router.post("/product/add", auth.verifySeller, productController.addProduct);
 router.put("/product/update/:id", auth.verifySeller, productController.updateProduct);
 router.delete("/product/delete/:id", auth.verifySeller, productController.deleteProduct);
-router.get("/product/search", auth.verifySeller, productController.searchProduct);
 router.get("/product/all", auth.verifySeller, productController.getProducts);
 
 // Category routes
-router.post("/category/add", categoryController.addCategory);
+router.post("/category/add",auth.verifySeller, categoryController.addCategory);
 router.put("/category/update", auth.verifySeller, categoryController.updateCategory);
 router.delete("/category/delete", auth.verifySeller, categoryController.deleteCategory);
-router.get("/category/all", auth.verifySeller, categoryController.getCategories);
+
 
 //Coupon routes
 router.post("/coupon/create",auth.verifySeller,Coupon.createCoupon);

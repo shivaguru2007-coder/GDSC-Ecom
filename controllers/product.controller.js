@@ -10,6 +10,21 @@ const addProduct = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+const addImage = async (req, res) => {
+  const {productId}= req.body
+
+  try {
+    const image = req.file ? req.file.path : null;
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    product.image = req.file.filename;
+    await product.save();
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 
 const getProducts = async (req, res) => {
   try {
@@ -69,5 +84,6 @@ module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
-  searchProduct
+  searchProduct,
+  addImage
 }
