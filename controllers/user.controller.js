@@ -112,8 +112,6 @@ const login = async (req, res) => {
 };
 
 
-
-// Add funds - Step 1: Initiate Payment
 const addBalance = async (req, res) => {
   const { userId, amount } = req.body;
 

@@ -86,8 +86,6 @@ const sellerLogin = async (req, res) => {
 };
 
 
-
-
 module.exports={
     createSeller,
     getSellerDetails,

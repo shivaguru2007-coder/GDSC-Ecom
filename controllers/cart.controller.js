@@ -128,12 +128,25 @@ const clearCart = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
+const cartVal = async (req, res) => {
+    const { userId } = req.body;
+    
+    try {
+        const user = await User.findById(userId);
+        let totalAmount = 0;
+        user.cart.forEach((item) => {
+          totalAmount += item.productId.price * item.quantity;
+        });
+    }catch(error){
+        res.status(500).json({ message: "Server error", error });
+    }
+}
 module.exports = {
     addCart,
     getCart,
     updateCart,
     clearCart,
     removeCart,
-    reduceCart
+    reduceCart,
+    cartVal
 };

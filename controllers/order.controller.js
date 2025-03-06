@@ -45,7 +45,7 @@ const placeOrder = async (req, res) => {
     }
 
     const paymentSuccess = await mockPayment.mockPaymentGateway(totalAmount);
-    if (!paymentSuccess) return res.status(400).json({ message: "Payment failed, try again" });
+    if (!paymentSuccess.success) return res.status(400).json({ message: "Payment failed, try again" });
 
     user.balance -= totalAmount;
 
