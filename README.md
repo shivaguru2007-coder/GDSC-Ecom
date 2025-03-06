@@ -4,7 +4,7 @@ Provide an overview of the project, its purpose, and the technologies used.
 <h1>Getting Started</h1>
 <h2>Prerequisites</h2>
 
-List the software and tools required to run the project (e.g., Node.js, npm).
+List the software and tools required to run the project (e.g., Node.js, npm, EXPRESS AND OTHERS).
 
 <h2>Installation</h2>
 
