@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/users");
 const dotenv = require("dotenv");
-const otpVerification = require("./mail.controller");
+const {sendOTP,userLogin} = require("./mail.controller");
 const {mockPaymentGateway}=require("./payment.controllers")
 dotenv.config();
 
@@ -28,7 +28,7 @@ const register = async (req, res) => {
     const user = await User.create({ name, email, password, address, gender, dob, verificationToken,balance });
     
     if (user) {
-      otpVerification(email, verificationToken);
+      sendOTP(email, verificationToken);
       res.status(201).json({ status: true, message: "Registration Successful. OTP sent to email." });
     } else {
       res.status(400).json({ message: "Error creating user" });
@@ -78,7 +78,7 @@ const resendVerification = async (req, res) => {
     user.verificationToken = newOtp;
     await user.save();
 
-    otpVerification(email, newOtp);
+    sendOTP(email, newOtp);
     res.status(200).json({ status: true, message: "OTP resent successfully." });
   } catch (error) {
     res.status(500).json({ message: "Error resending OTP", error });
@@ -98,11 +98,12 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-
+     
     if (!user.verifiedAt) {
       return res.status(401).json({ message: "User not verified. Please verify your email first." });
     }
-
+    userLogin(user.email, user.name);
+    
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ token, message: "Login successful" });
@@ -132,8 +133,7 @@ const addBalance = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    //let bal = user.balance;
+   //let bal = user.balance;
     //console.log(typeof(amount))
     user.balance += parseInt(amount);
     await user.save();
@@ -147,6 +147,24 @@ const addBalance = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const viewBalance = async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
 
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ balance: user.balance });
+    
 
-module.exports = { register, login, verify, resendVerification, addBalance};
+}
+catch (error) {
+  res.status(500).json({ message: "Server error", error });
+}
+}
+
+module.exports = { register, login, verify, resendVerification, addBalance,viewBalance};

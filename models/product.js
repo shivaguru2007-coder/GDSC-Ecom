@@ -39,6 +39,15 @@ const productSchema = new mongoose.Schema(
         type:String,
         default:null
     },
+    seller:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Seller",
+        required: true,
+    },
+    keywords: {
+      type: [String],
+      default: [],
+    },
     createdAt: {
       type: Date,
       default: Date.now,

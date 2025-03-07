@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../models/users");
 
+
 const verifyAdmin = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1]; 
   console.log(token);
@@ -23,14 +24,19 @@ const verifyAdmin = (req, res, next) => {
   }
 };
 
-const verifyUser = async (req, res, next) => {
+const authUser = async (req, res, next) => {
+  const {userId} = req.body;
   try {
     const token = req.header("Authorization");
-
+    const user = await User.findById(userId);
     if (!token) {
       return res.status(401).json({ message: "Access denied. No token provided." });
     }
-
+    if(!user){
+      return res.status(404).json({ message: "User not found" });
+    }
+    //resend code verification
+    if(user.verifiedAt === null) return res.status(401).json({ message: "Access denied. Please verify yourself" });
     // Ensure token is in "Bearer TOKEN" format
     const tokenParts = token.split(" ");
     if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer") {
@@ -72,6 +78,6 @@ const validateUserCreation = (req, res, next) => {
     next();
   };
 
-module.exports={validateUserCreation, verifyAdmin, verifyUser};
+module.exports={validateUserCreation, verifyAdmin, authUser};
 
   

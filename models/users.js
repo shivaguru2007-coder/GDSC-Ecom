@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
         quantity: { type: Number, required: true, default: 1 },
       },
     ],
+    webhookUrl: { type: String }
 });
   
   userSchema.pre("save", async function (next) {
