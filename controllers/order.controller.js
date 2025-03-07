@@ -1,7 +1,7 @@
 const Coupon = require("../models/coupon");
 const Order = require("../models/order");
 const User = require("../models/users");
-const {orderConfirm} = require("./mail.controller");
+const {orderConfirm,orderCancelSeller,orderConfirmSeller} = require("./mail.controller");
 const mockPayment = require("./payment.controllers");
 
 const createOrder = async (req, res) => {
@@ -18,7 +18,9 @@ const createOrder = async (req, res) => {
     user.cart.forEach((item) => {
       totalAmount += item.productId.price * item.quantity;
     });
-
+    // This will stop from creating multiple orders for the same cart
+    const findOrder = await Order.findOne({ userId: user._id, status: "Pending" });
+    if (findOrder) return res.status(400).json({ message: "Complete pending order first" });
     const order = new Order({
       userId: user._id,
       items: user.cart.map((item) => ({
@@ -80,6 +82,7 @@ const finishOrder = async (req, res) => {
     //mail for order confirmation
     console.log(user.email,user.name,orderId);
     orderConfirm(user.email,user.name,orderId);
+    //orderConfirmSeller(seller.email,user.name,orderId);
     user.balance -= order.totalAmount;
     user.cart = [];
     order.status = "Paid";
@@ -93,4 +96,45 @@ const finishOrder = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, applyCoupon, finishOrder };
+const viewOrder = async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+
+  try {
+    const user = await User.findById(userId); 
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const order = await Order.find({ userId: user._id});
+    console.log({userId: user._id})
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json({ order: order });
+    }catch (error) {
+      res.status(500).json({ message: "Server error", error });
+    }
+}
+const cancelOrder = async (req, res) => {
+    const { userId, orderId } = req.body;
+    if (!userId || !orderId) return res.status(400).json({ message: "User ID and Order ID are required" });
+    
+    try {
+        const user = await User.findById(userId);
+        const order = await Order.findById(orderId);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!order) return res.status(404).json({ message: "Order not found" });
+        if (order.status === "Cancelled") {
+            return res.status(400).json({ message: "Order already cancelled" });
+        }else{
+            order.status = "Cancelled";
+            await order.save();
+            res.json({ message: "Order cancelled successfully!", order });
+        }
+    }catch(error){
+        res.status(400).json({ message: "Server error",error });
+    }
+}
+module.exports = { createOrder, applyCoupon, finishOrder,viewOrder,cancelOrder};

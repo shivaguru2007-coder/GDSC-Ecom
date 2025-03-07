@@ -1,5 +1,6 @@
 const User = require("../models/users");
 const Product = require("../models/product");
+const sendWebhookNotification = require("../utils/webhook");
 
 const addCart = async (req, res) => {
   const { userId, productId, quantity } = req.body;
@@ -22,7 +23,11 @@ const addCart = async (req, res) => {
     } else {
       user.cart.push({ productId, quantity });
     }
-
+    sendWebhookNotification(user.webhookUrl, {
+        event: "cart_updated",
+        message: "Item added to cart",
+        cart: user.cart,
+      });
     await user.save();
     res.json({ message: "Product added to cart", cart: user.cart });
   } catch (error) {
@@ -80,7 +85,11 @@ const removeCart = async (req, res) => {
 
     user.cart = user.cart.filter((item) => item.productId.toString() !== productId);
     await user.save();
-
+    sendWebhookNotification(user.webhookUrl, {
+        event: "cart_updated",
+        message: "Item removed from cart",
+        cart: user.cart,
+      });
     res.json({ message: "Product removed from cart", cart: user.cart });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -114,7 +123,7 @@ const reduceCart = async (req, res) => {
 };
 
 const clearCart = async (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.body;
 
   try {
     const user = await User.findById(userId);
